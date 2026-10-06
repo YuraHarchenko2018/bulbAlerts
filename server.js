@@ -123,6 +123,7 @@ async function checkAirRaidAlert() {
     
     if (previousAlertState === null) {
       previousAlertState = isAlertActive;
+      isAlertActive ? await setRedLight() : await setWarmLight();
       console.log( isAlertActive ? "🚨 Alert is active" : "✅ Currently no alert" );
       return;
     }
