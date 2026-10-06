@@ -12,6 +12,9 @@ const PORT = 3000;
 const email = process.env.TAPO_EMAIL;
 const password = process.env.TAPO_PASSWORD;
 const deviceIp = process.env.TAPO_DEVICE_IP;
+const districtSlug = process.env.DISTRICT_SLUG;
+
+const ALERT_URL = `https://tryvoha.online/api/v1/alerts/${districtSlug}`; 
 
 let device;
 let lightOn = false;
@@ -24,6 +27,8 @@ async function init() {
     console.log("🔌 Connecting to the bulb...");
     device = await loginDeviceByIp(email, password, deviceIp);
     console.log("✅ Connected successfully!");
+
+    startAlertPolling();
 
     // Starting the mic monitoring
     // startMicMonitor();
@@ -100,6 +105,50 @@ async function init() {
 //     console.log("💤 Silence — light turned off.");
 //   }
 // }
+
+let previousAlertState = null;
+
+async function checkAirRaidAlert() {
+  try {
+    console.log("Checking for air raid alert...");
+
+    const response = await fetch(ALERT_URL);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const isAlertActive = data.active === true;
+    
+    if (previousAlertState === null) {
+      previousAlertState = isAlertActive;
+      console.log( isAlertActive ? "🚨 Alert is active" : "✅ Currently no alert" );
+      return;
+    }
+
+    // Alert is activated
+    if (!previousAlertState && isAlertActive) {
+      console.log("🚨 Alert started");
+      await setRedLight();
+    }
+    
+    // Alert is over
+    if (previousAlertState && !isAlertActive) {
+      console.log("✅ Alert ended");
+      await setWarmLight();
+    }
+    previousAlertState = isAlertActive;
+  } catch (error) {
+    console.error("❌ Error while checking alert:", error.message);
+  }
+}
+
+function startAlertPolling() {
+  checkAirRaidAlert();
+  setInterval(checkAirRaidAlert, 10_000);
+}
+
 
 async function setRedLight() {
   if (!device) return;
