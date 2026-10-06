@@ -147,7 +147,7 @@ async function checkAirRaidAlert() {
 
 function startAlertPolling() {
   checkAirRaidAlert();
-  setInterval(checkAirRaidAlert, 10_000);
+  setInterval(checkAirRaidAlert, 20_000);
 }
 
 
