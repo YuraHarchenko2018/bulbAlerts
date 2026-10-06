@@ -143,7 +143,6 @@ app.get("/off", async (req, res) => {
 app.get("/red", async (req, res) => {
   try {
     await setRedLight();
-    res.send("🔴 Light set to red!");
   } catch (e) {
     console.error(e);
     res.status(500).send("Error setting red light");
@@ -153,7 +152,6 @@ app.get("/red", async (req, res) => {
 app.get("/warm", async (req, res) => {
   try {
     await setWarmLight();
-    res.send("💡 Light set to warm white!");
   } catch (e) {
     console.error(e);
     res.status(500).send("Error setting warm light");
