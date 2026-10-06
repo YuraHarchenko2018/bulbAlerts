@@ -1,7 +1,7 @@
 const express = require("express");
 const { loginDeviceByIp } = require("tp-link-tapo-connect");
 // const record = require("node-record-lpcm16");
-const { Transform } = require("stream");
+// const { Transform } = require("stream");
 
 require("dotenv").config();
 
@@ -143,18 +143,20 @@ app.get("/off", async (req, res) => {
 app.get("/red", async (req, res) => {
   try {
     await setRedLight();
+    res.send("🔴 Light set to red!");
   } catch (e) {
     console.error(e);
-    res.status(500).send("Ошибка");
+    res.status(500).send("Error setting red light");
   }
 });
 
 app.get("/warm", async (req, res) => {
   try {
     await setWarmLight();
+    res.send("💡 Light set to warm white!");
   } catch (e) {
     console.error(e);
-    res.status(500).send("Ошибка");
+    res.status(500).send("Error setting warm light");
   }
 });
 
